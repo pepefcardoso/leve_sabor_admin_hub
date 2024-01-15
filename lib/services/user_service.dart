@@ -17,13 +17,9 @@ class UserService {
       },
     );
 
-    log('333332');
-
     final String? token = response.data['token'];
 
     final String? error = response.data['error'];
-
-    log('111');
 
     if (token != null) {
       return token;

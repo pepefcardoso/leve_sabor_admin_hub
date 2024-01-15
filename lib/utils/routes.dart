@@ -1,3 +1,5 @@
+
+
 import 'package:go_router/go_router.dart';
 import 'package:leve_sabor_admin_hub/screens/home_page.dart';
 import 'package:leve_sabor_admin_hub/screens/login_page.dart';
@@ -11,20 +13,19 @@ class Routes {
         routes: [
           GoRoute(
             path: '/',
+            builder: (context, state) => const LoginPage(),
             redirect: (_, __) {
               if (isLogged) {
-                return '/home';
+                return 'home';
               }
-              return '/login';
+              return null;
             },
-          ),
-          GoRoute(
-            path: '/login',
-            builder: (context, state) => const LoginPage(),
-          ),
-          GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomePage(),
+            routes: [
+              GoRoute(
+                path: 'home',
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
           ),
         ],
       );
