@@ -7,7 +7,7 @@ import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
 import 'package:leve_sabor_admin_hub/services/blog_post_categories_service.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
-import 'package:leve_sabor_admin_hub/services/user_service.dart';
+import 'package:leve_sabor_admin_hub/services/login_service.dart';
 import 'package:leve_sabor_admin_hub/utils/api_config.dart';
 import 'package:leve_sabor_admin_hub/utils/http.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
@@ -22,36 +22,33 @@ class AppInitialization {
 
     late final Http http;
 
-    late final UserService userService;
+    late final LoginService loginService;
+
+    late final LoginBloc loginBloc;
 
     try {
-      globalKiwiContainer.registerFactory<Http>(
-          (container) => Http(dio: Dio(BaseOptions(baseUrl: _apiHost))));
+      globalKiwiContainer.registerFactory<LoginService>((container) => const LoginService());
+
+      loginService = globalKiwiContainer.resolve<LoginService>();
+
+      globalKiwiContainer.registerSingleton((container) => LoginBloc(loginService));
+
+      loginBloc = globalKiwiContainer.resolve<LoginBloc>();
+
+      globalKiwiContainer.registerFactory<Http>((container) => Http(dio: Dio(BaseOptions(baseUrl: _apiHost)), loginBloc: loginBloc));
 
       http = globalKiwiContainer.resolve<Http>();
 
-      globalKiwiContainer
-          .registerFactory<UserService>((container) => UserService(http: http));
+      globalKiwiContainer.registerFactory<BlogPostsService>((container) => BlogPostsService(http: http));
 
-      userService = globalKiwiContainer.resolve<UserService>();
-
-      globalKiwiContainer
-          .registerFactory<LoginBloc>((container) => LoginBloc(userService));
-
-      globalKiwiContainer.registerFactory<BlogPostsService>(
-          (container) => BlogPostsService(http: http));
-
-      globalKiwiContainer.registerFactory<BlogPostCategoriesService>(
-          (container) => BlogPostCategoriesService(http: http));
+      globalKiwiContainer.registerFactory<BlogPostCategoriesService>((container) => BlogPostCategoriesService(http: http));
     } on HttpException catch (httpException) {
       if (kDebugMode) {
-        print(
-            '[AppInitialization.initialize]: [HttpException] error in app initialization: "${httpException.mensagem}"');
+        print('[AppInitialization.initialize]: [HttpException] error in app initialization: "${httpException.mensagem}"');
       }
     } catch (error, stackTrace) {
       if (kDebugMode) {
-        print(
-            '[AppInitialization.initialize]: Generic error in app initialization: "$error"\nstackTrace: $stackTrace');
+        print('[AppInitialization.initialize]: Generic error in app initialization: "$error"\nstackTrace: $stackTrace');
       }
 
       dart_io.exit(1);

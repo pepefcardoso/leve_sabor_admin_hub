@@ -45,7 +45,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               widget.controller.setImage(File(pickedFile.path));
             }
           },
-          child: Text('Pick Image'),
+          child: const Text('Pick Image'),
         ),
       ],
     );

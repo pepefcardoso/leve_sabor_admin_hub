@@ -1,15 +1,14 @@
-import 'package:leve_sabor_admin_hub/utils/http.dart';
+import 'package:dio/dio.dart';
+import 'package:leve_sabor_admin_hub/utils/api_config.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
 
-class UserService {
-  final Http http;
-
-  UserService({required this.http});
+class LoginService {
+  const LoginService();
 
   Future<String> login(String email, String password) async {
-    final response = await http.postJson(
-      '/api/login',
-      dados: {
+    final response = await Dio().post(
+      '${ApiConfig.host}/api/login',
+      data: {
         'email': email,
         'password': password,
       },
@@ -28,7 +27,12 @@ class UserService {
     }
   }
 
-  Future<void> logout() async {
-    await http.postJson('/logout');
+  Future<void> logout(String token) async {
+    await Dio().post('${ApiConfig.host}/api/users/logout',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ));
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
@@ -38,15 +37,13 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _contentController = TextEditingController();
-    _statusController =
-        RadioController<String>(value: BlogPostStatusEnum.draft.toString());
+    _statusController = RadioController<String>(value: BlogPostStatusEnum.draft.toString());
     _categoriesController = CheckboxGroupController([]);
     _imageController = ImagePickerController();
 
     _blogPostsService = container.resolve<BlogPostsService>();
     _blogPostCategoriesService = container.resolve<BlogPostCategoriesService>();
-    _blogPostsFormBloc =
-        BlogPostsFormBloc(_blogPostsService, _blogPostCategoriesService);
+    _blogPostsFormBloc = BlogPostsFormBloc(_blogPostsService, _blogPostCategoriesService);
     _blogPostsFormBloc.add(const RequestGetBlogPostCategoriesEvent());
   }
 
@@ -167,9 +164,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                               const Text('Categories'),
                               const SizedBox(height: 8.0),
                               CheckboxGroup(
-                                items: state.categories
-                                    .map((category) => category.name!)
-                                    .toList(),
+                                items: state.categories.map((category) => category.name!).toList(),
                                 controller: _categoriesController,
                               )
                             ],

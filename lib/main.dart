@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/app_initialization.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
-import 'package:leve_sabor_admin_hub/services/user_service.dart';
+import 'package:leve_sabor_admin_hub/services/login_service.dart';
 import 'package:leve_sabor_admin_hub/utils/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,7 +22,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Routes routes = Routes(false);
 
-  late final UserService userService;
+  late final LoginService userService;
   late final LoginBloc loginBloc;
 
   @override
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
 
     final globalKiwi = KiwiContainer();
 
-    userService = globalKiwi.resolve<UserService>();
+    userService = globalKiwi.resolve<LoginService>();
 
     loginBloc = globalKiwi.resolve<LoginBloc>();
   }
