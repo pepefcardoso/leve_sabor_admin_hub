@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () => GoRouter.of(context).go('/blog_posts'),
+                    onPressed: () => GoRouter.of(context).go('/home/blog-posts'),
                     icon: const Icon(Icons.book),
                     color: Colors.green,
                     iconSize: 36.0,

@@ -48,12 +48,11 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
             return Column(
               children: [
                 TextButton(
-                  onPressed: () => GoRouter.of(context).go('/blog_posts/new'),
+                  onPressed: () => GoRouter.of(context).go('/home/blog-posts/new'),
                   child: const Text('Novo post'),
                 ),
                 const SizedBox(height: 32.0),
-                if (state.blogPosts.isEmpty)
-                  const Text('Nenhum post do blog foi encontrado!'),
+                if (state.blogPosts.isEmpty) const Text('Nenhum post do blog foi encontrado!'),
                 if (state.blogPosts.isNotEmpty) ...[
                   for (var blogPost in state.blogPosts)
                     ListTile(

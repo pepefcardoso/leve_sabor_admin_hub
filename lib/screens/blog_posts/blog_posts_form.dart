@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
@@ -37,7 +39,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _contentController = TextEditingController();
-    _statusController = RadioController<String>(value: BlogPostStatusEnum.draft.toString());
+    _statusController = RadioController<String>(value: BlogPostStatusEnum.PUBLISHED.toString());
     _categoriesController = CheckboxGroupController([]);
     _imageController = ImagePickerController();
 
@@ -72,6 +74,8 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
         child: BlocConsumer<BlogPostsFormBloc, BlogPostsFormState>(
           listener: (context, state) {
             if (state.status == DefaultBlocStatusEnum.error) {
+              log(state.error ?? 'Erro desconhecido');
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.error ?? 'Erro desconhecido'),
@@ -147,9 +151,9 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                               RadioGroup<String>(
                                 controller: _statusController,
                                 items: [
-                                  BlogPostStatusEnum.draft.toString(),
-                                  BlogPostStatusEnum.published.toString(),
-                                  BlogPostStatusEnum.archived.toString(),
+                                  BlogPostStatusEnum.DRAFT.toString(),
+                                  BlogPostStatusEnum.ARCHIVED.toString(),
+                                  BlogPostStatusEnum.PUBLISHED.toString(),
                                 ],
                                 onChanged: () {},
                               ),
@@ -205,12 +209,16 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
   }
 
   Map<String, dynamic> _getParameters() {
+    // final categories = _categoriesController.value.map((e) => e.id).toList();
+
     return {
       'title': _titleController.text,
       'description': _descriptionController.text,
       'content': _contentController.text,
-      'status': _statusController.value,
-      'categories': _categoriesController.value,
+      'status': 'PUBLISHED',
+      // 'status': _statusController.value.toString(),
+      'categories': [1, 2],
+      // 'categories': categories,
       'image': _imageController.value,
     };
   }

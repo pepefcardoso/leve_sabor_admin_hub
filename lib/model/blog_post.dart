@@ -31,7 +31,7 @@ class BlogPost {
         title = json['title'],
         description = json['description'],
         content = json['content'],
-        imageUrl = json['image_url'],
+        imageUrl = json['temporary_url_blog_post_image'],
         status = json['status'] != null
             ? BlogPostStatusEnum.values.firstWhere(
                 (e) => e.toString() == 'BlogPostStatusEnum.${json['status']}')

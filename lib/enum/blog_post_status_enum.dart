@@ -1,5 +1,5 @@
 enum BlogPostStatusEnum {
-  draft,
-  published,
-  archived,
+  DRAFT,
+  PUBLISHED,
+  ARCHIVED,
 }

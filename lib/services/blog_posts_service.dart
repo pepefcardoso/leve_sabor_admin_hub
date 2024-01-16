@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:leve_sabor_admin_hub/model/blog_post.dart';
 import 'package:leve_sabor_admin_hub/utils/http.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
@@ -20,7 +23,14 @@ class BlogPostsService {
   }
 
   Future<BlogPost> register(Map<String, dynamic> parameters) async {
-    final response = await http.postJson('/api/blog-posts', dados: parameters);
+    final MultipartFile image = MultipartFile.fromBytes(
+      (parameters['image']).readAsBytesSync(),
+      filename: (parameters['image'] as File).path.split('/').last,
+    );
+
+    parameters['image'] = image;
+
+    final response = await http.postJson('/api/blog-posts', dados: FormData.fromMap(parameters, ListFormat.multiCompatible));
 
     final dynamic data = response.data;
 

@@ -1,3 +1,5 @@
+
+
 import 'package:go_router/go_router.dart';
 import 'package:leve_sabor_admin_hub/screens/blog_posts/blog_posts_form.dart';
 import 'package:leve_sabor_admin_hub/screens/blog_posts/blog_posts_index.dart';
@@ -13,25 +15,33 @@ class Routes {
         routes: [
           GoRoute(
             path: '/',
-            redirect: (_, __) {
-              if (isLogged) {
+            redirect: (context, state) {
+              if (isLogged && !state.uri.path.contains('home')) {
                 return '/home';
+              } else if (!isLogged && !state.uri.path.contains('login')) {
+                return '/login';
               }
+
               return null;
             },
-            builder: (context, state) => const LoginPage(),
             routes: [
+              GoRoute(
+                path: 'login',
+                builder: (context, state) => const LoginPage(),
+              ),
               GoRoute(
                 path: 'home',
                 builder: (context, state) => const HomePage(),
-              ),
-              GoRoute(
-                path: 'blog_posts',
-                builder: (context, state) => const BlogPostsIndex(),
                 routes: [
                   GoRoute(
-                    path: 'new',
-                    builder: (context, state) => const BlogPostsForm(),
+                    path: 'blog-posts',
+                    builder: (context, state) => const BlogPostsIndex(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (context, state) => const BlogPostsForm(),
+                      ),
+                    ],
                   ),
                 ],
               ),
