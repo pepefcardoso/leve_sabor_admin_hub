@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:leve_sabor_admin_hub/model/user.dart';
 import 'package:leve_sabor_admin_hub/utils/api_config.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
 
@@ -34,5 +35,20 @@ class LoginService {
             'Authorization': 'Bearer $token',
           },
         ));
+  }
+
+  Future<User> getUserData({required String token}) async {
+    try {
+      final response = await Dio().post(
+        '${ApiConfig.host}/api/users/me',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final User user = User.fromJson(response.data);
+
+      return user;
+    } catch (e) {
+      throw HttpException(e);
+    }
   }
 }

@@ -14,6 +14,10 @@ class RequestLogin extends LoginEvent {
   });
 }
 
+class RequestGetAccessToken extends LoginEvent {
+  const RequestGetAccessToken();
+}
+
 class RequestLogout extends LoginEvent {
   const RequestLogout();
 }

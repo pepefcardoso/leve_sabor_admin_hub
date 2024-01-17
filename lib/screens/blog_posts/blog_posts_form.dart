@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
@@ -150,8 +151,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                       maxLines: 10,
                     ),
                     const SizedBox(height: 16.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Column(

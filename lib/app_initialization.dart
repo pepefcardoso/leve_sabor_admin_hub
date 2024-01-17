@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
+import 'package:leve_sabor_admin_hub/components/login_store.dart';
+import 'package:leve_sabor_admin_hub/model/user.dart';
 import 'package:leve_sabor_admin_hub/services/blog_post_categories_service.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
 import 'package:leve_sabor_admin_hub/services/login_service.dart';
@@ -18,30 +20,54 @@ class AppInitialization {
   Future<void> initialize() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    final globalKiwiContainer = KiwiContainer();
+    // Setting up login flow
+    LoginService loginService = const LoginService();
+    final LoginStore loginStore = LoginStore();
+    await loginStore.onReady;
+    late LoginState initialLoginState;
 
-    late final Http http;
+    if (loginStore.isLogged()) {
+      final String token = loginStore.getToken();
 
-    late final LoginService loginService;
+      try {
+        User user = await loginService.getUserData(token: token);
 
-    late final LoginBloc loginBloc;
+        initialLoginState = LoginState(
+          status: LoginStatus.loggedIn,
+          token: token,
+          user: user,
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          print('[AppInitialization.initialize]: Generic error in app initialization: "$e"');
+        }
+
+        initialLoginState = const LoginState(status: LoginStatus.loggedOut);
+      }
+    } else {
+      initialLoginState = const LoginState(status: LoginStatus.loggedOut);
+    }
+
+    final LoginBloc loginBloc = LoginBloc(loginService: loginService,loginStore: loginStore,state: initialLoginState);
+
+    final Http http = Http(
+      dio: Dio(BaseOptions(baseUrl: _apiHost)),
+      loginBloc: loginBloc,
+      loginStore: loginStore,
+    );
+
+    final KiwiContainer kiwi = KiwiContainer();
 
     try {
-      globalKiwiContainer.registerFactory<LoginService>((container) => const LoginService());
+      kiwi.registerSingleton<Http>((c) => http);
 
-      loginService = globalKiwiContainer.resolve<LoginService>();
+      kiwi.registerSingleton<LoginStore>((c) => loginStore);
 
-      globalKiwiContainer.registerSingleton((container) => LoginBloc(loginService));
+      kiwi.registerSingleton<LoginBloc>((c) => loginBloc);
 
-      loginBloc = globalKiwiContainer.resolve<LoginBloc>();
+      kiwi.registerFactory<BlogPostsService>((container) => BlogPostsService(http: http));
 
-      globalKiwiContainer.registerFactory<Http>((container) => Http(dio: Dio(BaseOptions(baseUrl: _apiHost)), loginBloc: loginBloc));
-
-      http = globalKiwiContainer.resolve<Http>();
-
-      globalKiwiContainer.registerFactory<BlogPostsService>((container) => BlogPostsService(http: http));
-
-      globalKiwiContainer.registerFactory<BlogPostCategoriesService>((container) => BlogPostCategoriesService(http: http));
+      kiwi.registerFactory<BlogPostCategoriesService>((container) => BlogPostCategoriesService(http: http));
     } on HttpException catch (httpException) {
       if (kDebugMode) {
         print('[AppInitialization.initialize]: [HttpException] error in app initialization: "${httpException.mensagem}"');

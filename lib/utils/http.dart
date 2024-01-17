@@ -1,13 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
+import 'package:leve_sabor_admin_hub/components/login_store.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
 
 class Http {
   final Dio dio;
+  final LoginStore loginStore;
   final LoginBloc loginBloc;
 
   Http({
     required this.dio,
+    required this.loginStore,
     required this.loginBloc,
   });
 
@@ -17,10 +20,8 @@ class Http {
       'Accept': 'application/json',
     };
 
-    final String? token = loginBloc.state.token;
-
-    if (token != null) {
-      headers['Authorization'] = 'Bearer $token';
+    if (loginStore.isLogged()) {
+      headers['Authorization'] = loginStore.getAccessToken();
     }
 
     return Options(

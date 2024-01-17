@@ -1,29 +1,40 @@
 part of 'login_bloc.dart';
 
-enum LoginStatus { logged, logging, notLogged, error }
+enum LoginStatus { initial, loggingIn, loggedIn, loggingOut, loggedOut, error }
 
 @immutable
 class LoginState {
-  final String? token;
   final LoginStatus status;
+  final String? token;
+  final User? user;
   final String? error;
 
   const LoginState({
+    required this.status,
     this.token,
-    this.status = LoginStatus.notLogged,
+    this.user,
     this.error,
   });
 
   LoginState copyWith({
-    String? token,
     LoginStatus? status,
+    String? token,
+    User? user,
     String? error,
-    bool? loggedOut,
   }) {
     return LoginState(
-      token: loggedOut == true ? null : token ?? this.token,
       status: status ?? this.status,
+      token: token ?? this.token,
+      user: user ?? this.user,
       error: error ?? this.error,
     );
+  }
+
+  bool get isLoggingIn {
+    return (status == LoginStatus.loggingIn);
+  }
+
+  bool get isLoggedIn {
+    return (status == LoginStatus.loggedIn);
   }
 }

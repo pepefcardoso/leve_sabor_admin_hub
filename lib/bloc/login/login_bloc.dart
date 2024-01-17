@@ -1,6 +1,6 @@
-
-
 import 'package:bloc/bloc.dart';
+import 'package:leve_sabor_admin_hub/components/login_store.dart';
+import 'package:leve_sabor_admin_hub/model/user.dart';
 import 'package:leve_sabor_admin_hub/services/login_service.dart';
 import 'package:leve_sabor_admin_hub/utils/http_exception.dart';
 import 'package:meta/meta.dart';
@@ -11,8 +11,13 @@ part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginService loginService;
+  final LoginStore loginStore;
 
-  LoginBloc(this.loginService) : super(const LoginState()) {
+  LoginBloc({
+    required this.loginService,
+    required this.loginStore,
+    required LoginState state,
+  }) : super(state) {
     on<LoginEvent>((event, emit) async {
       try {
         if (event is RequestLogin) {
