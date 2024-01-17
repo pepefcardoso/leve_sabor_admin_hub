@@ -9,12 +9,10 @@ part 'blog_posts_index_event.dart';
 
 part 'blog_posts_index_state.dart';
 
-class BlogPostsIndexBloc
-    extends Bloc<BlogPostsIndexEvent, BlogPostsIndexState> {
+class BlogPostsIndexBloc extends Bloc<BlogPostsIndexEvent, BlogPostsIndexState> {
   final BlogPostsService blogPostService;
 
-  BlogPostsIndexBloc(this.blogPostService)
-      : super(const BlogPostsIndexState()) {
+  BlogPostsIndexBloc(this.blogPostService) : super(const BlogPostsIndexState()) {
     on<BlogPostsIndexEvent>((event, emit) async {
       try {
         if (event is RequestBlogPostsIndex) {
@@ -22,16 +20,20 @@ class BlogPostsIndexBloc
 
           final List<BlogPost> blogPosts = await blogPostService.index();
 
-          emit(state.copyWith(
-              blogPosts: blogPosts, status: DefaultBlocStatusEnum.loaded));
+          emit(state.copyWith(blogPosts: blogPosts, status: DefaultBlocStatusEnum.loaded));
+        } else if (event is RequestDeleteBlogPost) {
+          emit(state.copyWith(status: DefaultBlocStatusEnum.loading));
+
+          await blogPostService.delete(event.id);
+
+          final List<BlogPost> blogPosts = await blogPostService.index();
+
+          emit(state.copyWith(blogPosts: blogPosts, status: DefaultBlocStatusEnum.loaded));
         }
       } on HttpException catch (httpException) {
-        emit(state.copyWith(
-            error: httpException.mensagem,
-            status: DefaultBlocStatusEnum.error));
+        emit(state.copyWith(error: httpException.mensagem, status: DefaultBlocStatusEnum.error));
       } catch (e) {
-        emit(state.copyWith(
-            error: e.toString(), status: DefaultBlocStatusEnum.error));
+        emit(state.copyWith(error: e.toString(), status: DefaultBlocStatusEnum.error));
       }
     });
   }

@@ -32,12 +32,19 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Blog Posts'),
+        backgroundColor: Colors.green[900],
+        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 24.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       body: BlocProvider.value(
         value: _blogPostsIndexBloc,
-        child: BlocConsumer<BlogPostsIndexBloc, BlogPostsIndexState>(
-          listener: (context, state) {
-            // TODO: implement listener
-          },
+        child: BlocBuilder<BlogPostsIndexBloc, BlogPostsIndexState>(
           builder: (context, state) {
             if (state.status == DefaultBlocStatusEnum.loading) {
               return const Center(
@@ -45,30 +52,87 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
               );
             }
 
-            return Column(
-              children: [
-                TextButton(
-                  onPressed: () => GoRouter.of(context).go('/home/blog-posts/new'),
-                  child: const Text('Novo post'),
-                ),
-                const SizedBox(height: 32.0),
-                if (state.blogPosts.isEmpty) const Text('Nenhum post do blog foi encontrado!'),
-                if (state.blogPosts.isNotEmpty) ...[
-                  for (var blogPost in state.blogPosts)
-                    ListTile(
-                        title: Text(blogPost.title ?? 'Não informado'),
-                        subtitle: Text(blogPost.description ?? 'Não informado'),
-                        trailing: Image.network(
-                          blogPost.imageUrl ?? '',
-                          width: 100.0,
-                          height: 100.0,
-                        )),
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: () => GoRouter.of(context).go('/home/blog-posts/new'),
+                    child: const Text('Novo post'),
+                  ),
+                  const SizedBox(height: 32.0),
+                  if (state.blogPosts.isEmpty) const Text('Nenhum post do blog foi encontrado!'),
+                  if (state.blogPosts.isNotEmpty) ...[
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: state.blogPosts.length,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemBuilder: (context, index) {
+                          final blogPost = state.blogPosts[index];
+
+                          return ListTile(
+                            title: Text(blogPost.title ?? ''),
+                            subtitle: Text(blogPost.description ?? ''),
+                            leading: blogPost.imageUrl != null
+                                ? Image.network(
+                                    blogPost.imageUrl!,
+                                    width: 100.0,
+                                    height: 100.0,
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  onPressed: () => GoRouter.of(context).go('/home/blog-posts/edit/${blogPost.id}'),
+                                  icon: const Icon(Icons.edit),
+                                ),
+                                const SizedBox(width: 8.0),
+                                IconButton(
+                                  onPressed: () => _showDeleteDialog(context, () {
+                                    _blogPostsIndexBloc.add(RequestDeleteBlogPost(blogPost.id!));
+                                    Navigator.of(context).pop();
+                                  }),
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             );
           },
         ),
       ),
+    );
+  }
+
+  Future<void> _showDeleteDialog(BuildContext context, VoidCallback onConfirm) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Atenção'),
+          content: const Text('Deseja deletar este post?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Confirmar'),
+              onPressed: () => onConfirm(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

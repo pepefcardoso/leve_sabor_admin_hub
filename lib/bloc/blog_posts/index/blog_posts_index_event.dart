@@ -7,3 +7,9 @@ abstract class BlogPostsIndexEvent {
 class RequestBlogPostsIndex extends BlogPostsIndexEvent {
   const RequestBlogPostsIndex();
 }
+
+class RequestDeleteBlogPost extends BlogPostsIndexEvent {
+  final int id;
+
+  const RequestDeleteBlogPost(this.id);
+}

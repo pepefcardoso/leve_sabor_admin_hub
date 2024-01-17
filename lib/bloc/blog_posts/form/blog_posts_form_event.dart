@@ -13,3 +13,16 @@ class RequestSaveBlogPostEvent extends BlogPostsFormEvent {
 class RequestGetBlogPostCategoriesEvent extends BlogPostsFormEvent {
   const RequestGetBlogPostCategoriesEvent();
 }
+
+class RequestGetBlogPostEvent extends BlogPostsFormEvent {
+  final int id;
+
+  const RequestGetBlogPostEvent({required this.id});
+}
+
+class RequestUpdateBlogPostEvent extends BlogPostsFormEvent {
+  final int id;
+  final Map<String, dynamic> parameters;
+
+  const RequestUpdateBlogPostEvent({required this.id, required this.parameters});
+}

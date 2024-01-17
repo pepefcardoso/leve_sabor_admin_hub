@@ -32,20 +32,9 @@ class BlogPost {
         description = json['description'],
         content = json['content'],
         imageUrl = json['temporary_url_blog_post_image'],
-        status = json['status'] != null
-            ? BlogPostStatusEnum.values.firstWhere(
-                (e) => e.toString() == 'BlogPostStatusEnum.${json['status']}')
-            : null,
-        categories = json['categories'] != null
-            ? (json['categories'] as List)
-                .map((tag) => BlogPostCategory.fromJson(tag))
-                .toList()
-            : null,
+        status = json['status'] != null ? BlogPostStatusEnum.values.firstWhere((element) => element.value == json['status']) : null,
+        categories = json['categories'] != null ? (json['categories'] as List).map((tag) => BlogPostCategory.fromJson(tag)).toList() : null,
         userId = json['user_id'],
-        createdAt = json['created_at'] != null
-            ? DateTime.parse(json['created_at'])
-            : null,
-        updatedAt = json['updated_at'] != null
-            ? DateTime.parse(json['updated_at'])
-            : null;
+        createdAt = json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+        updatedAt = json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null;
 }

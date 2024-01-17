@@ -40,4 +40,45 @@ class BlogPostsService {
       throw const HttpException('Erro desconhecido');
     }
   }
+
+  Future<BlogPost> update(int id, Map<String, dynamic> parameters) async {
+    final MultipartFile image = MultipartFile.fromBytes(
+      (parameters['image']).readAsBytesSync(),
+      filename: (parameters['image'] as File).path.split('/').last,
+    );
+
+    parameters['image'] = image;
+
+    parameters['_method'] = 'PUT';
+
+    final response = await http.postJson('/api/blog-posts/$id', dados: FormData.fromMap(parameters, ListFormat.multiCompatible));
+
+    final dynamic data = response.data;
+
+    if (data != null) {
+      return BlogPost.fromJson(data);
+    } else {
+      throw const HttpException('Erro desconhecido');
+    }
+  }
+
+  Future<void> delete(int id) async {
+    final response = await http.deleteJson('/api/blog-posts/$id');
+
+    if (response.statusCode != HttpStatus.noContent) {
+      throw const HttpException('Erro desconhecido');
+    }
+  }
+
+  Future<BlogPost> show(int id) async {
+    final response = await http.getJson('/api/blog-posts/$id');
+
+    final dynamic data = response.data;
+
+    if (data != null) {
+      return BlogPost.fromJson(data);
+    } else {
+      throw const HttpException('Erro desconhecido');
+    }
+  }
 }

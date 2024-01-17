@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class RadioController<T> extends ValueNotifier<T?> {
-  RadioController({T? value}) : super(value);
+class RadioController<String> extends ValueNotifier<String?> {
+  RadioController({String? value}) : super(value);
 }
 
-class RadioGroup<T> extends StatefulWidget {
-  final RadioController<T> controller;
+class RadioGroup<String> extends StatefulWidget {
+  final RadioController<String> controller;
   final VoidCallback? onChanged;
   final List<String> items;
 
@@ -17,10 +17,10 @@ class RadioGroup<T> extends StatefulWidget {
   }) : super();
 
   @override
-  State<RadioGroup<T>> createState() => _RadioGroupState<T>();
+  State<RadioGroup<String>> createState() => _RadioGroupState<String>();
 }
 
-class _RadioGroupState<T> extends State<RadioGroup<T>> {
+class _RadioGroupState<String> extends State<RadioGroup<String>> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,11 +28,11 @@ class _RadioGroupState<T> extends State<RadioGroup<T>> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var item in widget.items)
-          RadioListTile<T>(
-            title: Text(item),
-            value: item as T,
+          RadioListTile(
+            title: Text(item.toString()),
+            value: item,
             groupValue: widget.controller.value,
-            onChanged: (T? value) {
+            onChanged: (String? value) {
               setState(() => widget.controller.value = value);
               widget.onChanged?.call();
             },

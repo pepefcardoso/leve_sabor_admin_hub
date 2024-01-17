@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CheckboxGroupController extends ValueNotifier<List<String>> {
-  CheckboxGroupController(List<String> value) : super(value);
+  CheckboxGroupController(super.value);
 
   void addItem(String item) {
     value = [...value, item];
@@ -34,12 +34,11 @@ class _CheckboxGroupState extends State<CheckboxGroup> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 8.0, // Adjust spacing between items
-      runSpacing: 8.0, // Adjust spacing between rows
+      spacing: 8.0,
+      runSpacing: 8.0,
       children: widget.items.map((item) {
         return Row(
           mainAxisSize: MainAxisSize.min,
-          // Adjust this to control the width of each row
           children: [
             Checkbox(
               value: widget.controller.containsItem(item),

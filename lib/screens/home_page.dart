@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
+import 'package:leve_sabor_admin_hub/components/home_page_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,32 +24,33 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ElevatedButton(
+      appBar: AppBar(
+        title: const Text('Leve Sabor'),
+        backgroundColor: Colors.green[900],
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 24.0,
+          fontWeight: FontWeight.bold,
+        ),
+        actions: [
+          IconButton(
             onPressed: () => _loginBloc.add(const RequestLogout()),
-            child: const Text('Logout'),
+            color: Colors.white,
+            icon: const Icon(Icons.logout),
           ),
-          const SizedBox(height: 32.0),
-          Row(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () => GoRouter.of(context).go('/home/blog-posts'),
-                    icon: const Icon(Icons.book),
-                    color: Colors.green,
-                    iconSize: 36.0,
-                  ),
-                  const SizedBox(height: 8.0),
-                  const Text('Posts do blog')
-                ],
-              ),
-            ],
-          )
         ],
+      ),
+      body: const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Row(
+          children: [
+            HomePageButton(
+              label: 'Blog Posts',
+              icon: Icons.book_outlined,
+              route: '/home/blog-posts',
+            ),
+          ],
+        ),
       ),
     );
   }
