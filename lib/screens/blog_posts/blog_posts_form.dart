@@ -61,7 +61,6 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
         _contentController.text = state.blogPost!.content ?? '';
         _statusController.value = state.blogPost!.status?.label ?? BlogPostStatusEnum.published.label;
         _categoriesController.value = state.blogPost!.categories?.map((category) => category.name!).toList() ?? [];
-        // _imageController.value = state.blogPost?.image;
       }
     });
   }

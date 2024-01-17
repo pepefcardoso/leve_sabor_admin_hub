@@ -42,12 +42,72 @@ class _HomePageState extends State<HomePage> {
       ),
       body: const Padding(
         padding: EdgeInsets.all(32.0),
-        child: Row(
+        child: Column(
           children: [
-            HomePageButton(
-              label: 'Blog Posts',
-              icon: Icons.book_outlined,
-              route: '/home/blog-posts',
+            Row(
+              children: [
+                HomePageButton(
+                  label: 'Users',
+                  icon: Icons.supervised_user_circle,
+                  route: '/home/users',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Businesses',
+                  icon: Icons.business,
+                  route: '/home/businesses',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Reviews',
+                  icon: Icons.star,
+                  route: '/home/reviews',
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              children: [
+                HomePageButton(
+                  label: 'Roles',
+                  icon: Icons.person,
+                  route: '/home/roles',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Blog Posts',
+                  icon: Icons.book_outlined,
+                  route: '/home/blog-posts',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Blog Post Categories',
+                  icon: Icons.bookmark_add,
+                  route: '/home/blog-posts-categories',
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              children: [
+                HomePageButton(
+                  label: 'Diets',
+                  icon: Icons.food_bank_outlined,
+                  route: '/home/diets',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Business Categories',
+                  icon: Icons.list_alt_sharp,
+                  route: '/home/business-categories',
+                ),
+                SizedBox(width: 16.0),
+                HomePageButton(
+                  label: 'Cooking Styles',
+                  icon: Icons.kitchen,
+                  route: '/home/cooking-styles',
+                ),
+              ],
             ),
           ],
         ),

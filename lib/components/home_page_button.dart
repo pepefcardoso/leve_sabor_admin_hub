@@ -21,20 +21,27 @@ class HomePageButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(16.0),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: Colors.green[800],
-              size: 64.0,
+        child: SizedBox(
+          width: 136.0,
+          height: 136.0,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.green[800],
+                  size: 64.0,
+                ),
+                const SizedBox(height: 4.0),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: Tipografia.titulo3,
+                ),
+              ],
             ),
-            const SizedBox(height: 4.0),
-            Text(
-              label,
-              style: Tipografia.titulo3,
-            ),
-          ],
+          ),
         ),
       ),
     );
