@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/app_initialization.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
-import 'package:leve_sabor_admin_hub/services/login_service.dart';
 import 'package:leve_sabor_admin_hub/utils/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,19 +20,19 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final Routes routes = Routes(false);
-
-  late final LoginService userService;
   late final LoginBloc loginBloc;
 
   @override
   void initState() {
     super.initState();
 
-    final globalKiwi = KiwiContainer();
+    final kiwi = KiwiContainer();
 
-    userService = globalKiwi.resolve<LoginService>();
+    loginBloc = kiwi.resolve<LoginBloc>();
 
-    loginBloc = globalKiwi.resolve<LoginBloc>();
+    if (loginBloc.state.isLoggedIn) {
+      routes.isLogged = true;
+    }
   }
 
   @override
@@ -42,14 +41,12 @@ class _MyAppState extends State<MyApp> {
       value: loginBloc,
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
-          if (state.status == LoginStatus.logging || state.status == LoginStatus.error) {
-            return;
-          }
-
-          if (state.status == LoginStatus.notLogged) {
+          if (state.status == LoginStatus.loggedOut) {
             routes.isLogged = false;
-          } else if (state.status == LoginStatus.logged) {
+          } else if (state.status == LoginStatus.loggedIn) {
             routes.isLogged = true;
+          } else {
+            return;
           }
           setState(() {
             routes.router.go('/');

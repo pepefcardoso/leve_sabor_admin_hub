@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:leve_sabor_admin_hub/components/login_store.dart';
 import 'package:leve_sabor_admin_hub/model/user.dart';
@@ -21,21 +23,35 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginEvent>((event, emit) async {
       try {
         if (event is RequestLogin) {
-          emit(state.copyWith(status: LoginStatus.logging));
+          emit(state.copyWith(status: LoginStatus.loggingIn));
 
           final String token = await loginService.login(event.email, event.password);
 
-          emit(state.copyWith(token: token, status: LoginStatus.logged));
+          final User user = await loginService.getUserData(token: token);
+
+          await loginStore.storeToken(token);
+          loginStore.storeLastEmail(event.email);
+
+          emit(state.copyWith(
+            status: LoginStatus.loggedIn,
+            user: user,
+          ));
         } else if (event is RequestLogout) {
-          emit(state.copyWith(status: LoginStatus.logging));
+          emit(state.copyWith(status: LoginStatus.loggingOut));
 
-          await loginService.logout(state.token!);
+          await loginService.logout(token: loginStore.getToken());
 
-          emit(state.copyWith(loggedOut: true, status: LoginStatus.notLogged));
+          loginStore.revokeToken();
+
+          emit(state.copyWith(status: LoginStatus.loggedOut, loggedOut: true));
         }
       } on HttpException catch (httpException) {
+        log(httpException.mensagem);
+
         emit(state.copyWith(error: httpException.mensagem, status: LoginStatus.error));
       } catch (e) {
+        log(e.toString());
+
         emit(state.copyWith(error: e.toString(), status: LoginStatus.error));
       }
     });

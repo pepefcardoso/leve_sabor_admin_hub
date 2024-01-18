@@ -21,7 +21,9 @@ class Http {
     };
 
     if (loginStore.isLogged()) {
-      headers['Authorization'] = loginStore.getAccessToken();
+      final String authorization = loginStore.getAccessToken();
+
+      headers['Authorization'] = authorization;
     }
 
     return Options(

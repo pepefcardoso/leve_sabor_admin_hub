@@ -4,7 +4,7 @@ class LoginStore {
   static final LoginStore _singleton = LoginStore._();
   late final SharedPreferences _prefs;
   final String _token = "token";
-  final String _lastUsername = 'last_username';
+  final String _lastEmail = 'last_email';
 
   late Future onReady;
 
@@ -20,8 +20,8 @@ class LoginStore {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  void storeToken(String token) async {
-    _prefs.setString(_token, token);
+  Future<void> storeToken(String token) async {
+    await _prefs.setString(_token, token);
   }
 
   String getToken() {
@@ -42,15 +42,15 @@ class LoginStore {
     return _prefs.containsKey(_token);
   }
 
-  void storeLastUsername(String username) {
-    _prefs.setString(_lastUsername, username);
+  void storeLastEmail(String email) {
+    _prefs.setString(_lastEmail, email);
   }
 
-  String? recuperarUltimoUsername() {
-    return _prefs.getString(_lastUsername);
+  String? getLastEmail() {
+    return _prefs.getString(_lastEmail);
   }
 
-  void removerUltimoUsername() {
-    _prefs.remove(_lastUsername);
+  void removeLastEmail() {
+    _prefs.remove(_lastEmail);
   }
 }

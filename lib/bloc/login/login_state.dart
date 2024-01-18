@@ -5,27 +5,24 @@ enum LoginStatus { initial, loggingIn, loggedIn, loggingOut, loggedOut, error }
 @immutable
 class LoginState {
   final LoginStatus status;
-  final String? token;
   final User? user;
   final String? error;
 
   const LoginState({
     required this.status,
-    this.token,
     this.user,
     this.error,
   });
 
   LoginState copyWith({
     LoginStatus? status,
-    String? token,
     User? user,
     String? error,
+    bool loggedOut = false,
   }) {
     return LoginState(
       status: status ?? this.status,
-      token: token ?? this.token,
-      user: user ?? this.user,
+      user: loggedOut ? null : user ?? this.user,
       error: error ?? this.error,
     );
   }

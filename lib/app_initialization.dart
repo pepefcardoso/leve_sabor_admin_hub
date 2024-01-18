@@ -34,7 +34,6 @@ class AppInitialization {
 
         initialLoginState = LoginState(
           status: LoginStatus.loggedIn,
-          token: token,
           user: user,
         );
       } catch (e) {
@@ -48,7 +47,11 @@ class AppInitialization {
       initialLoginState = const LoginState(status: LoginStatus.loggedOut);
     }
 
-    final LoginBloc loginBloc = LoginBloc(loginService: loginService,loginStore: loginStore,state: initialLoginState);
+    final LoginBloc loginBloc = LoginBloc(
+      loginService: loginService,
+      loginStore: loginStore,
+      state: initialLoginState,
+    );
 
     final Http http = Http(
       dio: Dio(BaseOptions(baseUrl: _apiHost)),
