@@ -1,6 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
+import 'package:leve_sabor_admin_hub/components/custom_text_formfield.dart';
+import 'package:leve_sabor_admin_hub/utils/cores.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,10 +15,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _senhaController;
   late final String? _lastEmail;
   late final LoginBloc _loginBloc;
+
+  String? _onSubmit() {
+    if (_formKey.currentState!.validate()) {
+      _loginBloc.add(RequestLogin(
+        email: _emailController.text,
+        password: _senhaController.text,
+      ));
+    }
+
+    return null;
+  }
 
   @override
   void initState() {
@@ -39,63 +55,143 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: BlocConsumer<LoginBloc, LoginState>(
-            listener: (context, state) {
-              if (state.status == LoginStatus.error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error!),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            builder: (context, state) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Login',
-                    style: Tipografia.titulo1,
-                  ),
-                  const SizedBox(height: 24.0),
-                  if (state.status == LoginStatus.loggingIn) ...[
-                    const Center(child: CircularProgressIndicator()),
-                    const SizedBox(height: 12.0),
-                  ] else ...[
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'E-mail',
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    TextFormField(
-                      controller: _senhaController,
-                      decoration: const InputDecoration(
-                        labelText: 'Senha',
-                      ),
-                      onChanged: (ssss) {},
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        _loginBloc.add(
-                          RequestLogin(
-                            email: _emailController.text,
-                            password: _senhaController.text,
+      backgroundColor: Colors.grey[400],
+      body: BlocConsumer<LoginBloc, LoginState>(
+        listener: (context, state) {
+          if (state.status == LoginStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error!),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 70.0),
+                  child: Card(
+                    surfaceTintColor: Colors.grey[300],
+                    elevation: 8.0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(16.0),
+                              bottomLeft: Radius.circular(16.0),
+                            ),
+                            child: Image.asset(
+                              'assets/images/login_page_cover.jpg',
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        );
-                      },
-                      child: const Text('Entrar'),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(48.0),
+                            child: Column(
+                              children: [
+                                const _LogoCard(),
+                                const SizedBox(height: 16.0),
+                                const Text(
+                                  'Olá! Seja bem vindo de volta!',
+                                  style: Tipografia.titulo4,
+                                ),
+                                const SizedBox(height: 48.0),
+                                if (state.status == LoginStatus.loggingIn) ...[
+                                  const Center(child: CircularProgressIndicator()),
+                                ] else ...[
+                                  SizedBox(
+                                    height: 115.0,
+                                    child: CustomTextField(
+                                      controller: _emailController,
+                                      labelText: 'E-mail',
+                                      hintText: 'Digite seu e-mail',
+                                      icon: Icons.email,
+                                      validator: (value) => EmailValidator.validate(value ?? '') ? null : "Email inválido",
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 115.0,
+                                    child: CustomTextField(
+                                      controller: _senhaController,
+                                      labelText: 'Senha',
+                                      obscureText: true,
+                                      hintText: 'Digite sua senha',
+                                      icon: Icons.lock,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty || value.length < 8) {
+                                          return 'Campo obrigatório';
+                                        }
+
+                                        return null;
+                                      },
+                                      onSubmitted: (_) => _onSubmit(),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24.0),
+                                  SizedBox(
+                                    height: 48.0,
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 4.0,
+                                        backgroundColor: Cores.verde1,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                                      ),
+                                      onPressed: _onSubmit,
+                                      child: Text(
+                                        'Entrar',
+                                        style: Tipografia.titulo2.copyWith(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ],
-              );
-            },
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LogoCard extends StatelessWidget {
+  const _LogoCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      elevation: 4.0,
+      color: Cores.verde1,
+      child: SizedBox(
+        height: 120.0,
+        width: 120.0,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SvgPicture.asset(
+            'assets/svg/logo_svg.svg',
+            height: 38.0,
+            colorFilter: const ColorFilter.mode(
+              Colors.white,
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),
