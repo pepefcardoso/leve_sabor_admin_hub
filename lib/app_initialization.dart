@@ -64,13 +64,15 @@ class AppInitialization {
     try {
       kiwi.registerSingleton<Http>((c) => http);
 
+      final Http kiwiHttp = kiwi.resolve<Http>();
+
       kiwi.registerSingleton<LoginStore>((c) => loginStore);
 
       kiwi.registerSingleton<LoginBloc>((c) => loginBloc);
 
-      kiwi.registerFactory<BlogPostsService>((container) => BlogPostsService(http: http));
+      kiwi.registerFactory<BlogPostsService>((container) => BlogPostsService(http: kiwiHttp));
 
-      kiwi.registerFactory<BlogPostCategoriesService>((container) => BlogPostCategoriesService(http: http));
+      kiwi.registerFactory<BlogPostCategoriesService>((container) => BlogPostCategoriesService(http: kiwiHttp));
     } on HttpException catch (httpException) {
       if (kDebugMode) {
         print('[AppInitialization.initialize]: [HttpException] error in app initialization: "${httpException.mensagem}"');
