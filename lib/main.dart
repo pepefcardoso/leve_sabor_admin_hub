@@ -20,13 +20,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final Routes routes = Routes(false);
+  final kiwi = KiwiContainer();
   late final LoginBloc loginBloc;
 
   @override
   void initState() {
     super.initState();
-
-    final kiwi = KiwiContainer();
 
     loginBloc = kiwi.resolve<LoginBloc>();
 
