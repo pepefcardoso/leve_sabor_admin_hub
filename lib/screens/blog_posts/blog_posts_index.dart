@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/blog_posts/index/blog_posts_index_bloc.dart';
 import 'package:leve_sabor_admin_hub/enum/default_bloc_status_enum.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
+import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class BlogPostsIndex extends StatefulWidget {
   const BlogPostsIndex({super.key});
@@ -44,7 +47,15 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
       ),
       body: BlocProvider.value(
         value: _blogPostsIndexBloc,
-        child: BlocBuilder<BlogPostsIndexBloc, BlogPostsIndexState>(
+        child: BlocConsumer<BlogPostsIndexBloc, BlogPostsIndexState>(
+          listener: (context, state) {
+            if (state.status == DefaultBlocStatusEnum.error) {
+              _showSnackBar(
+                content: state.error ?? 'Erro desconhecido',
+                bgColor: Colors.red,
+              );
+            }
+          },
           builder: (context, state) {
             if (state.status == DefaultBlocStatusEnum.loading) {
               return const Center(
@@ -58,7 +69,10 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton(
-                    onPressed: () => GoRouter.of(context).go('/home/blog-posts/new'),
+                    onPressed: () => GoRouter.of(context).go(
+                      '/home/blog-posts/new',
+                      extra: _onFinished,
+                    ),
                     child: const Text('Novo post'),
                   ),
                   const SizedBox(height: 32.0),
@@ -74,9 +88,9 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
                           return ListTile(
                             title: Text(blogPost.title ?? ''),
                             subtitle: Text(blogPost.description ?? ''),
-                            leading: blogPost.imageUrl != null
+                            leading: blogPost.image?.url != null
                                 ? Image.network(
-                                    blogPost.imageUrl!,
+                                    blogPost.image!.url!,
                                     width: 100.0,
                                     height: 100.0,
                                     fit: BoxFit.cover,
@@ -113,26 +127,50 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
     );
   }
 
-  Future<void> _showDeleteDialog(BuildContext context, VoidCallback onConfirm) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Atenção'),
-          content: const Text('Deseja deletar este post?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Confirmar'),
-              onPressed: () => onConfirm(),
-            ),
-          ],
-        );
-      },
+  void _onFinished() {
+    _blogPostsIndexBloc.add(const RequestBlogPostsIndex());
+  }
+
+  dynamic _showSnackBar({
+    required String content,
+    required Color bgColor,
+  }) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          content,
+          style: Tipografia.corpo2Bold,
+        ),
+        backgroundColor: bgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+      ),
     );
   }
+}
+
+Future<void> _showDeleteDialog(BuildContext context, VoidCallback onConfirm) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Atenção'),
+        content: const Text('Deseja deletar este post?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Confirmar'),
+            onPressed: () => onConfirm(),
+          ),
+        ],
+      );
+    },
+  );
 }

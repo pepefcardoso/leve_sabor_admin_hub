@@ -71,31 +71,32 @@ class _LoginPageState extends State<LoginPage> {
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 70.0),
-                  child: Card(
-                    surfaceTintColor: Colors.grey[300],
-                    elevation: 8.0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(16.0),
-                              bottomLeft: Radius.circular(16.0),
-                            ),
-                            child: Image.asset(
-                              'assets/images/login_page_cover.jpg',
-                              fit: BoxFit.cover,
-                            ),
+            child: Center(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.75,
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Card(
+                  surfaceTintColor: Colors.grey[300],
+                  elevation: 8.0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16.0),
+                            bottomLeft: Radius.circular(16.0),
+                          ),
+                          child: Image.asset(
+                            'assets/images/login_page_cover.jpg',
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(48.0),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(48.0),
+                          child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 const _LogoCard(),
@@ -108,33 +109,28 @@ class _LoginPageState extends State<LoginPage> {
                                 if (state.status == LoginStatus.loggingIn) ...[
                                   const Center(child: CircularProgressIndicator()),
                                 ] else ...[
-                                  SizedBox(
-                                    height: 115.0,
-                                    child: CustomTextField(
-                                      controller: _emailController,
-                                      labelText: 'E-mail',
-                                      hintText: 'Digite seu e-mail',
-                                      icon: Icons.email,
-                                      validator: (value) => EmailValidator.validate(value ?? '') ? null : "Email inválido",
-                                    ),
+                                  CustomTextField(
+                                    controller: _emailController,
+                                    labelText: 'E-mail',
+                                    hintText: 'Digite seu e-mail',
+                                    icon: Icons.email,
+                                    validator: (value) => EmailValidator.validate(value ?? '') ? null : "Email inválido",
                                   ),
-                                  SizedBox(
-                                    height: 115.0,
-                                    child: CustomTextField(
-                                      controller: _senhaController,
-                                      labelText: 'Senha',
-                                      obscureText: true,
-                                      hintText: 'Digite sua senha',
-                                      icon: Icons.lock,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty || value.length < 8) {
-                                          return 'Campo obrigatório';
-                                        }
+                                  const SizedBox(height: 16.0),
+                                  CustomTextField(
+                                    controller: _senhaController,
+                                    labelText: 'Senha',
+                                    obscureText: true,
+                                    hintText: 'Digite sua senha',
+                                    icon: Icons.lock,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty || value.length < 8) {
+                                        return 'Senha inválida';
+                                      }
 
-                                        return null;
-                                      },
-                                      onSubmitted: (_) => _onSubmit(),
-                                    ),
+                                      return null;
+                                    },
+                                    onSubmitted: (_) => _onSubmit(),
                                   ),
                                   const SizedBox(height: 24.0),
                                   SizedBox(
@@ -158,8 +154,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

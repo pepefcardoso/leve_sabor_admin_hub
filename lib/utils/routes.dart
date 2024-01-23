@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:go_router/go_router.dart';
 import 'package:leve_sabor_admin_hub/screens/blog_posts/blog_posts_form.dart';
 import 'package:leve_sabor_admin_hub/screens/blog_posts/blog_posts_index.dart';
@@ -41,7 +43,10 @@ class Routes {
                       ),
                       GoRoute(
                         path: 'edit/:id',
-                        builder: (context, state) => BlogPostsForm(id: int.parse(state.pathParameters['id']!)),
+                        builder: (context, state) => BlogPostsForm(
+                          id: int.parse(state.pathParameters['id']!),
+                          onFinished: state.extra as VoidCallback,
+                        ),
                       ),
                     ],
                   ),

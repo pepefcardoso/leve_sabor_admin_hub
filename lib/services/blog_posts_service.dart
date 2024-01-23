@@ -16,19 +16,25 @@ class BlogPostsService {
     final List<dynamic>? data = response.data;
 
     if (data != null) {
-      return data.map((dynamic json) => BlogPost.fromJson(json)).toList();
+      final List<BlogPost> blogPosts = data.map((dynamic json) => BlogPost.fromJson(json)).toList();
+
+      return blogPosts;
     } else {
       throw const HttpException('Erro desconhecido');
     }
   }
 
   Future<BlogPost> register(Map<String, dynamic> parameters) async {
-    final MultipartFile image = MultipartFile.fromBytes(
-      (parameters['image']).readAsBytesSync(),
-      filename: (parameters['image'] as File).path.split('/').last,
+    final Map<String, dynamic> imageData = Map.from(parameters['image']);
+
+    final MultipartFile file = MultipartFile.fromBytes(
+      (imageData['file']).readAsBytesSync(),
+      filename: (imageData['file'] as File).path.split('/').last,
     );
 
-    parameters['image'] = image;
+    imageData['file'] = file;
+
+    parameters['image'] = imageData;
 
     final response = await http.postJson('/api/blog-posts', dados: FormData.fromMap(parameters, ListFormat.multiCompatible));
 
@@ -42,12 +48,16 @@ class BlogPostsService {
   }
 
   Future<BlogPost> update(int id, Map<String, dynamic> parameters) async {
-    final MultipartFile image = MultipartFile.fromBytes(
-      (parameters['image']).readAsBytesSync(),
-      filename: (parameters['image'] as File).path.split('/').last,
+    final Map<String, dynamic> imageData = Map.from(parameters['image']);
+
+    final MultipartFile file = MultipartFile.fromBytes(
+      (imageData['file']).readAsBytesSync(),
+      filename: (imageData['file'] as File).path.split('/').last,
     );
 
-    parameters['image'] = image;
+    imageData['file'] = file;
+
+    parameters['image'] = imageData;
 
     parameters['_method'] = 'PUT';
 

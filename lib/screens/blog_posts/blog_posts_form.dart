@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/blog_posts/form/blog_posts_form_bloc.dart';
-import 'package:leve_sabor_admin_hub/components/checkbox.dart';
+import 'package:leve_sabor_admin_hub/components/checkbox/checkbox_group.dart';
+import 'package:leve_sabor_admin_hub/components/checkbox/checkbox_group_controller.dart';
+import 'package:leve_sabor_admin_hub/components/custom_text_formfield.dart';
 import 'package:leve_sabor_admin_hub/components/image_picker.dart';
-import 'package:leve_sabor_admin_hub/components/radio_box.dart';
+import 'package:leve_sabor_admin_hub/components/radio_box/radio_box_controller.dart';
+import 'package:leve_sabor_admin_hub/components/radio_box/radio_box_group.dart';
 import 'package:leve_sabor_admin_hub/enum/blog_post_status_enum.dart';
 import 'package:leve_sabor_admin_hub/enum/default_bloc_status_enum.dart';
 import 'package:leve_sabor_admin_hub/services/blog_post_categories_service.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
+import 'package:leve_sabor_admin_hub/utils/cores.dart';
+import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class BlogPostsForm extends StatefulWidget {
   final int? id;
+  final VoidCallback? onFinished;
 
   const BlogPostsForm({
     super.key,
     this.id,
+    this.onFinished,
   });
 
   @override
@@ -23,17 +30,37 @@ class BlogPostsForm extends StatefulWidget {
 }
 
 class _BlogPostsFormState extends State<BlogPostsForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _contentController;
   late final CheckboxGroupController _categoriesController;
-  late final RadioController<String> _statusController;
+  late final RadioBoxController<String> _statusController;
   late final ImagePickerController _imageController;
 
   final KiwiContainer container = KiwiContainer();
   late final BlogPostsService _blogPostsService;
   late final BlogPostCategoriesService _blogPostCategoriesService;
   late final BlogPostsFormBloc _blogPostsFormBloc;
+
+  void _onSubmit() {
+    if (_formKey.currentState!.validate()) {
+      final Map<String, dynamic> parameters = _getParameters();
+
+      if (widget.id != null) {
+        _blogPostsFormBloc.add(RequestUpdateBlogPostEvent(
+          id: widget.id!,
+          parameters: parameters,
+        ));
+        return;
+      }
+      _blogPostsFormBloc.add(RequestSaveBlogPostEvent(
+        parameters: parameters,
+      ));
+      return;
+    }
+    return;
+  }
 
   @override
   void initState() {
@@ -50,8 +77,8 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _contentController = TextEditingController();
-    _statusController = RadioController<String>(value: BlogPostStatusEnum.published.label);
-    _categoriesController = CheckboxGroupController([]);
+    _statusController = RadioBoxController(BlogPostStatusEnum.published.value);
+    _categoriesController = CheckboxGroupController();
     _imageController = ImagePickerController();
 
     _blogPostsFormBloc.stream.listen((state) {
@@ -59,8 +86,8 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
         _titleController.text = state.blogPost!.title ?? '';
         _descriptionController.text = state.blogPost!.description ?? '';
         _contentController.text = state.blogPost!.content ?? '';
-        _statusController.value = state.blogPost!.status?.label ?? BlogPostStatusEnum.published.label;
-        _categoriesController.value = state.blogPost!.categories?.map((category) => category.name!).toList() ?? [];
+        _statusController.item = state.blogPost!.status?.value ?? BlogPostStatusEnum.published.value;
+        _categoriesController.removeAndAddAll(state.blogPost!.categories?.map((category) => category.id!).toList() ?? []);
       }
     });
   }
@@ -84,34 +111,28 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Blog Posts'),
-        backgroundColor: Colors.green[900],
-        iconTheme: const IconThemeData(color: Colors.white),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 24.0,
-          fontWeight: FontWeight.bold,
-        ),
+        backgroundColor: Cores.verde2,
+        iconTheme: const IconThemeData(color: Cores.escuro),
+        titleTextStyle: Tipografia.titulo3.copyWith(color: Cores.escuro),
       ),
       body: BlocProvider.value(
         value: _blogPostsFormBloc,
         child: BlocConsumer<BlogPostsFormBloc, BlogPostsFormState>(
           listener: (context, state) {
             if (state.status == DefaultBlocStatusEnum.error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error ?? 'Erro desconhecido'),
-                  backgroundColor: Colors.red,
-                ),
+              _showSnackBar(
+                content: state.error ?? 'Erro desconhecido',
+                bgColor: Colors.red,
               );
             }
 
             if (state.status == DefaultBlocStatusEnum.loaded) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Post criado com sucesso!'),
-                  backgroundColor: Colors.green,
-                ),
+              _showSnackBar(
+                content: ('Post criado com sucesso!'),
+                bgColor: Cores.verde3,
               );
+
+              widget.onFinished?.call();
 
               Navigator.of(context).pop();
             }
@@ -122,99 +143,92 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                 child: CircularProgressIndicator(),
               );
             }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 32.0),
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Título',
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descrição',
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      controller: _contentController,
-                      decoration: const InputDecoration(
-                        labelText: 'Conteúdo',
-                      ),
-                      maxLines: 10,
-                    ),
-                    const SizedBox(height: 16.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Status'),
-                              const SizedBox(height: 8.0),
-                              RadioGroup<String>(
-                                controller: _statusController,
-                                items: [
-                                  for (final status in BlogPostStatusEnum.values) status.label,
-                                ],
-                                onChanged: () {},
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Categorias'),
-                              const SizedBox(height: 8.0),
-                              CheckboxGroup(
-                                items: state.categories.map((category) => category.name!).toList(),
-                                controller: _categoriesController,
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: ImagePickerWidget(
-                            controller: _imageController,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final Map<String, dynamic>? parameters = _validateParameters();
 
-                          if (parameters == null) {
-                            return;
-                          } else if (widget.id != null) {
-                            _blogPostsFormBloc.add(RequestUpdateBlogPostEvent(
-                              id: widget.id!,
-                              parameters: parameters,
-                            ));
-                            return;
-                          }
-                          _blogPostsFormBloc.add(RequestSaveBlogPostEvent(
-                            parameters: _getParameters(),
-                          ));
-                        },
-                        child: const Text('Salvar'),
+            return Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 24.0),
+                      CustomTextField(
+                        controller: _titleController,
+                        labelText: 'Título',
+                        hintText: 'Insira aqui o título',
+                        icon: Icons.title,
+                        validator: (value) => _defaultTextFieldValidator(
+                          value: value,
+                          label: 'Título',
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 24.0),
+                      CustomTextField(
+                        controller: _descriptionController,
+                        labelText: 'Descrição',
+                        hintText: 'Insira aqui a descrição',
+                        icon: Icons.description,
+                        validator: (value) => _defaultTextFieldValidator(
+                          value: value,
+                          label: 'Descrição',
+                        ),
+                      ),
+                      const SizedBox(height: 24.0),
+                      CustomTextField(
+                        controller: _contentController,
+                        labelText: 'Conteúdo',
+                        hintText: 'Insira aqui o conteúdo',
+                        icon: Icons.content_copy_sharp,
+                        validator: (value) => _defaultTextFieldValidator(
+                          value: value,
+                          label: 'Conteúdo',
+                        ),
+                      ),
+                      const SizedBox(height: 24.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _TitleAndWidget(
+                              title: 'Status',
+                              widget: RadioBoxGroup<String>(
+                                options: BlogPostStatusEnum.toMap,
+                                controller: _statusController,
+                                axis: Axis.vertical,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: _TitleAndWidget(
+                              title: 'Categorias',
+                              widget: CheckboxGroup(
+                                options: {for (final category in state.categories) category.name!: category.id},
+                                controller: _categoriesController,
+                                axis: Axis.vertical,
+                                mainAxisSpacing: 0,
+                                crossAxisSpacing: 0,
+                                spacing: 3,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ImagePickerWidget(
+                              controller: _imageController,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _onSubmit,
+                          child: const Text('Salvar'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -224,64 +238,72 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     );
   }
 
-  Map<String, dynamic> _getParameters() {
-    final List<int> categories = [];
-
-    for (final category in _categoriesController.value) {
-      final categoryFound = _blogPostsFormBloc.state.categories.firstWhere((element) => element.name == category);
-      categories.add(categoryFound.id!);
+  String? _defaultTextFieldValidator({
+    required String? value,
+    required String label,
+  }) {
+    if (value == null || value.isEmpty || value.length < 3) {
+      return '$label inválido(a)';
     }
 
-    final BlogPostStatusEnum status = BlogPostStatusEnum.values.firstWhere((element) => element.label == _statusController.value);
+    return null;
+  }
+
+  Map<String, dynamic> _getParameters() {
+    final BlogPostStatusEnum status = BlogPostStatusEnum.values.firstWhere((element) => element.value == _statusController.item);
 
     return {
       'title': _titleController.text,
       'description': _descriptionController.text,
       'content': _contentController.text,
       'status': status.value,
-      'categories': categories,
-      'image': _imageController.value,
+      'categories': _categoriesController.groupItems,
+      'image': {
+        'file': _imageController.value,
+      },
     };
   }
 
-  Map<String, dynamic>? _validateParameters() {
-    final List<String> errors = [];
+  dynamic _showSnackBar({
+    required String content,
+    required Color bgColor,
+  }) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
 
-    if (_titleController.text.isEmpty) {
-      errors.add('O título é obrigatório');
-    }
-
-    if (_descriptionController.text.isEmpty) {
-      errors.add('A descrição é obrigatória');
-    }
-
-    if (_contentController.text.isEmpty) {
-      errors.add('O conteúdo é obrigatório');
-    }
-
-    if (_statusController.value == null || _statusController.value!.isEmpty) {
-      errors.add('O status é obrigatório');
-    }
-
-    if (_categoriesController.value.isEmpty) {
-      errors.add('A categoria é obrigatória');
-    }
-
-    if (_imageController.value == null) {
-      errors.add('A imagem é obrigatória');
-    }
-
-    if (errors.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verifique os campos obrigatórios'),
-          backgroundColor: Colors.red,
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          content,
+          style: Tipografia.corpo2Bold,
         ),
-      );
+        backgroundColor: bgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+      ),
+    );
+  }
+}
 
-      return null;
-    }
+class _TitleAndWidget extends StatelessWidget {
+  final String title;
+  final Widget widget;
 
-    return _getParameters();
+  const _TitleAndWidget({
+    required this.title,
+    required this.widget,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Tipografia.titulo2),
+        const SizedBox(height: 4.0),
+        widget,
+      ],
+    );
   }
 }

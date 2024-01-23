@@ -26,9 +26,7 @@ class BlogPostsIndexBloc extends Bloc<BlogPostsIndexEvent, BlogPostsIndexState> 
 
           await blogPostService.delete(event.id);
 
-          final List<BlogPost> blogPosts = await blogPostService.index();
-
-          emit(state.copyWith(blogPosts: blogPosts, status: DefaultBlocStatusEnum.loaded));
+          emit(state.copyWith(status: DefaultBlocStatusEnum.loaded));
         }
       } on HttpException catch (httpException) {
         emit(state.copyWith(error: httpException.mensagem, status: DefaultBlocStatusEnum.error));

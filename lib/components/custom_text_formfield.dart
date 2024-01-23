@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:leve_sabor_admin_hub/utils/cores.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
@@ -10,6 +11,8 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final String? Function(String?)? onSubmitted;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextInputType keyboardType;
 
   const CustomTextField({
     super.key,
@@ -20,6 +23,8 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.onSubmitted,
+    this.inputFormatters,
+    this.keyboardType = TextInputType.text,
   }) : super();
 
   @override
@@ -38,6 +43,8 @@ class CustomTextField extends StatelessWidget {
             obscureText: obscureText,
             validator: validator,
             onFieldSubmitted: onSubmitted,
+            inputFormatters: inputFormatters,
+            keyboardType: keyboardType,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
