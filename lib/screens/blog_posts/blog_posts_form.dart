@@ -259,8 +259,6 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
       'file': _imageController.value,
     };
 
-    log(imageData.toString());
-
     return {
       'title': _titleController.text,
       'description': _descriptionController.text,
