@@ -2,12 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:leve_sabor_admin_hub/model/blog_post_image.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class ImagePickerWidget extends StatefulWidget {
+  final BlogPostImage? image;
   final ImagePickerController controller;
 
-  const ImagePickerWidget({super.key, required this.controller});
+  const ImagePickerWidget({
+    super.key,
+    this.image,
+    required this.controller,
+  });
 
   @override
   State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
@@ -18,7 +24,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   void initState() {
     super.initState();
 
-    widget.controller.addListener(() => setState(() {}));
+    if (mounted) widget.controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -38,25 +44,36 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.0),
         ),
-        height: 150.0,
+        height: 200.0,
+        width: 200.0,
         child: widget.controller.value != null
-            ? Image.file(
-                File(widget.controller.value!.path),
-                width: 180.0,
-                fit: BoxFit.cover,
-              )
-            : Center(
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_a_photo, size: 64.0, color: Colors.green[800]),
-                    const Text(
-                      'Selecione uma imagem',
-                      style: Tipografia.titulo3,
-                    ),
-                  ],
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: Image.file(
+                  File(widget.controller.value!.path),
+                  fit: BoxFit.cover,
                 ),
-            ),
+              )
+            : widget.image != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: Image.network(
+                      widget.image!.url!,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add_a_photo, size: 64.0, color: Colors.green[800]),
+                        const Text(
+                          'Selecione uma imagem',
+                          style: Tipografia.titulo3,
+                        ),
+                      ],
+                    ),
+                  ),
       ),
     );
   }

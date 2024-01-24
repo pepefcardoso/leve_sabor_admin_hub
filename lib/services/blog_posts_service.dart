@@ -27,12 +27,14 @@ class BlogPostsService {
   Future<BlogPost> register(Map<String, dynamic> parameters) async {
     final Map<String, dynamic> imageData = Map.from(parameters['image']);
 
-    final MultipartFile file = MultipartFile.fromBytes(
-      (imageData['file']).readAsBytesSync(),
-      filename: (imageData['file'] as File).path.split('/').last,
-    );
+    if (imageData['file'] != null) {
+      final MultipartFile file = MultipartFile.fromBytes(
+        (imageData['file']).readAsBytesSync(),
+        filename: (imageData['file'] as File).path.split('/').last,
+      );
 
-    imageData['file'] = file;
+      imageData['file'] = file;
+    }
 
     parameters['image'] = imageData;
 
@@ -50,12 +52,14 @@ class BlogPostsService {
   Future<BlogPost> update(int id, Map<String, dynamic> parameters) async {
     final Map<String, dynamic> imageData = Map.from(parameters['image']);
 
-    final MultipartFile file = MultipartFile.fromBytes(
-      (imageData['file']).readAsBytesSync(),
-      filename: (imageData['file'] as File).path.split('/').last,
-    );
+    if (imageData['file'] != null) {
+      final MultipartFile file = MultipartFile.fromBytes(
+        (imageData['file']).readAsBytesSync(),
+        filename: (imageData['file'] as File).path.split('/').last,
+      );
 
-    imageData['file'] = file;
+      imageData['file'] = file;
+    }
 
     parameters['image'] = imageData;
 
@@ -73,11 +77,7 @@ class BlogPostsService {
   }
 
   Future<void> delete(int id) async {
-    final response = await http.deleteJson('/api/blog-posts/$id');
-
-    if (response.statusCode != HttpStatus.noContent) {
-      throw const HttpException('Erro desconhecido');
-    }
+    await http.deleteJson('/api/blog-posts/$id');
   }
 
   Future<BlogPost> show(int id) async {

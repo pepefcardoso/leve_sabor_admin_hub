@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:leve_sabor_admin_hub/components/checkbox/checkbox.dart';
 import 'package:leve_sabor_admin_hub/components/checkbox/checkbox_group_controller.dart';
 
-typedef onChangedGroupCheckbox<T> = void Function(T changedItem);
+typedef OnChangedGroupCheckbox<T> = void Function(T changedItem);
 
 class CheckboxGroup<T> extends StatefulWidget {
   final Map<String, T> options;
   final List<T>? groupItems;
-  final onChangedGroupCheckbox<T>? onChangedItem;
+  final OnChangedGroupCheckbox<T>? onChangedItem;
   final CheckboxGroupController<T>? controller;
   final Axis axis;
   final CheckboxSize size;

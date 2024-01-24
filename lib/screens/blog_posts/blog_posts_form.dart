@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
@@ -10,6 +12,7 @@ import 'package:leve_sabor_admin_hub/components/radio_box/radio_box_controller.d
 import 'package:leve_sabor_admin_hub/components/radio_box/radio_box_group.dart';
 import 'package:leve_sabor_admin_hub/enum/blog_post_status_enum.dart';
 import 'package:leve_sabor_admin_hub/enum/default_bloc_status_enum.dart';
+import 'package:leve_sabor_admin_hub/model/blog_post.dart';
 import 'package:leve_sabor_admin_hub/services/blog_post_categories_service.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
 import 'package:leve_sabor_admin_hub/utils/cores.dart';
@@ -43,20 +46,25 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
   late final BlogPostCategoriesService _blogPostCategoriesService;
   late final BlogPostsFormBloc _blogPostsFormBloc;
 
-  void _onSubmit() {
+  void _onSubmit(BlogPost? post) {
     if (_formKey.currentState!.validate()) {
-      final Map<String, dynamic> parameters = _getParameters();
+      final Map<String, dynamic> parameters = _getParameters(post);
 
       if (widget.id != null) {
         _blogPostsFormBloc.add(RequestUpdateBlogPostEvent(
           id: widget.id!,
           parameters: parameters,
         ));
+
+        widget.onFinished?.call();
         return;
       }
       _blogPostsFormBloc.add(RequestSaveBlogPostEvent(
         parameters: parameters,
       ));
+
+      widget.onFinished?.call();
+
       return;
     }
     return;
@@ -127,13 +135,6 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
             }
 
             if (state.status == DefaultBlocStatusEnum.loaded) {
-              _showSnackBar(
-                content: ('Post criado com sucesso!'),
-                bgColor: Cores.verde3,
-              );
-
-              widget.onFinished?.call();
-
               Navigator.of(context).pop();
             }
           },
@@ -215,6 +216,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                           Expanded(
                             child: ImagePickerWidget(
                               controller: _imageController,
+                              image: state.blogPost?.image,
                             ),
                           ),
                         ],
@@ -223,7 +225,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _onSubmit,
+                          onPressed: () => _onSubmit(state.blogPost),
                           child: const Text('Salvar'),
                         ),
                       ),
@@ -249,8 +251,15 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     return null;
   }
 
-  Map<String, dynamic> _getParameters() {
+  Map<String, dynamic> _getParameters(BlogPost? post) {
     final BlogPostStatusEnum status = BlogPostStatusEnum.values.firstWhere((element) => element.value == _statusController.item);
+
+    final Map<String, dynamic> imageData = {
+      'id': _imageController.value != null ? null : post?.image?.id,
+      'file': _imageController.value,
+    };
+
+    log(imageData.toString());
 
     return {
       'title': _titleController.text,
@@ -258,9 +267,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
       'content': _contentController.text,
       'status': status.value,
       'categories': _categoriesController.groupItems,
-      'image': {
-        'file': _imageController.value,
-      },
+      'image': imageData,
     };
   }
 
@@ -277,8 +284,11 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
           style: Tipografia.corpo2Bold,
         ),
         backgroundColor: bgColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.0),
+            topRight: Radius.circular(16.0),
+          ),
         ),
       ),
     );

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -71,7 +69,7 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
                   TextButton(
                     onPressed: () => GoRouter.of(context).go(
                       '/home/blog-posts/new',
-                      extra: _onFinished,
+                      extra: _refreshData,
                     ),
                     child: const Text('Novo post'),
                   ),
@@ -100,13 +98,17 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  onPressed: () => GoRouter.of(context).go('/home/blog-posts/edit/${blogPost.id}'),
+                                  onPressed: () => GoRouter.of(context).go(
+                                    '/home/blog-posts/edit/${blogPost.id}',
+                                    extra: _refreshData,
+                                  ),
                                   icon: const Icon(Icons.edit),
                                 ),
                                 const SizedBox(width: 8.0),
                                 IconButton(
                                   onPressed: () => _showDeleteDialog(context, () {
                                     _blogPostsIndexBloc.add(RequestDeleteBlogPost(blogPost.id!));
+                                    _refreshData();
                                     Navigator.of(context).pop();
                                   }),
                                   icon: const Icon(Icons.delete),
@@ -127,7 +129,7 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
     );
   }
 
-  void _onFinished() {
+  void _refreshData() {
     _blogPostsIndexBloc.add(const RequestBlogPostsIndex());
   }
 
