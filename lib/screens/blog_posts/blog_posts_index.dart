@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kiwi/kiwi.dart';
 import 'package:leve_sabor_admin_hub/bloc/blog_posts/index/blog_posts_index_bloc.dart';
+import 'package:leve_sabor_admin_hub/components/posts_list_item.dart';
 import 'package:leve_sabor_admin_hub/enum/default_bloc_status_enum.dart';
+import 'package:leve_sabor_admin_hub/model/blog_post.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
+import 'package:leve_sabor_admin_hub/utils/custom_colors.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class BlogPostsIndex extends StatefulWidget {
@@ -71,50 +74,34 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
                       '/home/blog-posts/new',
                       extra: _refreshData,
                     ),
-                    child: const Text('Novo post'),
+                    child: const Text(
+                      '+ Novo post',
+                      style: Tipografia.titulo3,
+                    ),
                   ),
-                  const SizedBox(height: 32.0),
-                  if (state.blogPosts.isEmpty) const Text('Nenhum post do blog foi encontrado!'),
+                  const SizedBox(height: 24.0),
+                  if (state.blogPosts.isEmpty)
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Nenhum post do blog foi encontrado!',
+                          style: Tipografia.titulo1,
+                        ),
+                      ),
+                    ),
                   if (state.blogPosts.isNotEmpty) ...[
                     Expanded(
-                      child: ListView.separated(
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
                         itemCount: state.blogPosts.length,
-                        separatorBuilder: (context, index) => const Divider(),
                         itemBuilder: (context, index) {
-                          final blogPost = state.blogPosts[index];
+                          final BlogPost post = state.blogPosts[index];
 
-                          return ListTile(
-                            title: Text(blogPost.title ?? ''),
-                            subtitle: Text(blogPost.description ?? ''),
-                            leading: blogPost.image?.url != null
-                                ? Image.network(
-                                    blogPost.image!.url!,
-                                    width: 100.0,
-                                    height: 100.0,
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  onPressed: () => GoRouter.of(context).go(
-                                    '/home/blog-posts/edit/${blogPost.id}',
-                                    extra: _refreshData,
-                                  ),
-                                  icon: const Icon(Icons.edit),
-                                ),
-                                const SizedBox(width: 8.0),
-                                IconButton(
-                                  onPressed: () => _showDeleteDialog(context, () {
-                                    _blogPostsIndexBloc.add(RequestDeleteBlogPost(blogPost.id!));
-                                    _refreshData();
-                                    Navigator.of(context).pop();
-                                  }),
-                                  icon: const Icon(Icons.delete),
-                                ),
-                              ],
-                            ),
+                          return PostsItemList(
+                            post: post,
+                            color: CustomColors.randomColors[index % CustomColors.randomColors.length],
+                            refreshData: _refreshData,
+                            onConfirmDelete: () => _blogPostsIndexBloc.add(RequestDeleteBlogPost(post.id!)),
                           );
                         },
                       ),
@@ -152,27 +139,4 @@ class _BlogPostsIndexState extends State<BlogPostsIndex> {
       ),
     );
   }
-}
-
-Future<void> _showDeleteDialog(BuildContext context, VoidCallback onConfirm) async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Atenção'),
-        content: const Text('Deseja deletar este post?'),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancelar'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Confirmar'),
-            onPressed: () => onConfirm(),
-          ),
-        ],
-      );
-    },
-  );
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:leve_sabor_admin_hub/components/checkbox/animated_checkbox.dart';
 import 'package:leve_sabor_admin_hub/components/checkbox/checkbox_group.dart';
 import 'package:leve_sabor_admin_hub/components/interactive_text.dart';
-import 'package:leve_sabor_admin_hub/utils/cores.dart';
+import 'package:leve_sabor_admin_hub/utils/custom_colors.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 const Duration _kAnimationDuration = Duration(milliseconds: 150);
@@ -100,9 +100,9 @@ class _BaseCheckboxState extends State<BaseCheckbox> {
               onChanged: (_enabledCheckbox) ? (value) => _onPressedAction(value) : null,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
               splashRadius: 0,
-              checkColor: (_enabledCheckbox) ? Cores.verde3 : Colors.grey,
+              checkColor: (_enabledCheckbox) ? CustomColors.verde3 : Colors.grey,
               fillColor: Colors.white,
-              borderColor: Cores.verde3,
+              borderColor: CustomColors.verde3,
               tristate: widget.tristate,
               side: const BorderSide(width: 1.6),
             ),

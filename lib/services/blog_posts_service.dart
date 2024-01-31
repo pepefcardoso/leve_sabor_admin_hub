@@ -10,8 +10,11 @@ class BlogPostsService {
 
   BlogPostsService({required this.http});
 
-  Future<List<BlogPost>> index() async {
-    final response = await http.getJson('/api/blog-posts');
+  Future<List<BlogPost>> index({Map<String, dynamic>? parameters}) async {
+    final response = await http.getJson(
+      '/api/blog-posts',
+      queryParameters: parameters,
+    );
 
     final List<dynamic>? data = response.data;
 

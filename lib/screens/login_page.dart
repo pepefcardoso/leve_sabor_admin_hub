@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:leve_sabor_admin_hub/bloc/login/login_bloc.dart';
 import 'package:leve_sabor_admin_hub/components/custom_text_formfield.dart';
-import 'package:leve_sabor_admin_hub/utils/cores.dart';
+import 'package:leve_sabor_admin_hub/utils/custom_colors.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class LoginPage extends StatefulWidget {
@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         elevation: 4.0,
-                                        backgroundColor: Cores.verde1,
+                                        backgroundColor: CustomColors.verde1,
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
                                       ),
                                       onPressed: _onSubmit,
@@ -175,7 +175,7 @@ class _LogoCard extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       elevation: 4.0,
-      color: Cores.verde1,
+      color: CustomColors.verde1,
       child: SizedBox(
         height: 120.0,
         width: 120.0,

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart';
@@ -15,7 +13,7 @@ import 'package:leve_sabor_admin_hub/enum/default_bloc_status_enum.dart';
 import 'package:leve_sabor_admin_hub/model/blog_post.dart';
 import 'package:leve_sabor_admin_hub/services/blog_post_categories_service.dart';
 import 'package:leve_sabor_admin_hub/services/blog_posts_service.dart';
-import 'package:leve_sabor_admin_hub/utils/cores.dart';
+import 'package:leve_sabor_admin_hub/utils/custom_colors.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class BlogPostsForm extends StatefulWidget {
@@ -119,9 +117,9 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Blog Posts'),
-        backgroundColor: Cores.verde2,
-        iconTheme: const IconThemeData(color: Cores.escuro),
-        titleTextStyle: Tipografia.titulo3.copyWith(color: Cores.escuro),
+        backgroundColor: CustomColors.verde2,
+        iconTheme: const IconThemeData(color: CustomColors.escuro),
+        titleTextStyle: Tipografia.titulo3.copyWith(color: CustomColors.escuro),
       ),
       body: BlocProvider.value(
         value: _blogPostsFormBloc,
@@ -150,7 +148,7 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       const SizedBox(height: 24.0),
@@ -174,6 +172,9 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                           value: value,
                           label: 'Descrição',
                         ),
+                        minLines: 2,
+                        maxLines: 5,
+                        maxLength: 200,
                       ),
                       const SizedBox(height: 24.0),
                       CustomTextField(
@@ -185,6 +186,9 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                           value: value,
                           label: 'Conteúdo',
                         ),
+                        minLines: 8,
+                        maxLines: 12,
+                        maxLength: 5000,
                       ),
                       const SizedBox(height: 24.0),
                       Row(
@@ -217,6 +221,10 @@ class _BlogPostsFormState extends State<BlogPostsForm> {
                             child: ImagePickerWidget(
                               controller: _imageController,
                               image: state.blogPost?.image,
+                              onError: () => _showSnackBar(
+                                content: 'A imagem deve ter pelo menos 800px de largura e altura',
+                                bgColor: Colors.red,
+                              ),
                             ),
                           ),
                         ],

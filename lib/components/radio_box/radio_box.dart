@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leve_sabor_admin_hub/components/interactive_text.dart';
 import 'package:leve_sabor_admin_hub/components/radio_box/radio_box_group.dart';
-import 'package:leve_sabor_admin_hub/utils/cores.dart';
+import 'package:leve_sabor_admin_hub/utils/custom_colors.dart';
 import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 
 class RadioBox<T> extends StatefulWidget {
@@ -44,7 +44,7 @@ class _RadioBoxState<T> extends State<RadioBox<T>> {
         children: [
           Radio(
             value: _value,
-            fillColor: MaterialStateColor.resolveWith((states) => Cores.verde1),
+            fillColor: MaterialStateColor.resolveWith((states) => CustomColors.verde1),
             splashRadius: 0,
             groupValue: widget.groupValue,
             onChanged: _enabled ? (T? newValue) => _onPressedAction(newValue) : null,

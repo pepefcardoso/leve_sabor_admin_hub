@@ -8,11 +8,13 @@ import 'package:leve_sabor_admin_hub/utils/tipografia.dart';
 class ImagePickerWidget extends StatefulWidget {
   final BlogPostImage? image;
   final ImagePickerController controller;
+  final VoidCallback? onError;
 
   const ImagePickerWidget({
     super.key,
     this.image,
     required this.controller,
+    this.onError,
   });
 
   @override
@@ -31,13 +33,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16.0),
-      onTap: () async {
-        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-        if (pickedFile != null) {
-          widget.controller.setImage(File(pickedFile.path));
-        }
-      },
+      onTap: _pickImage,
       hoverColor: Colors.green[100],
       splashColor: Colors.green[400],
       child: Container(
@@ -76,6 +72,26 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                   ),
       ),
     );
+  }
+
+  void _pickImage() async {
+    final XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      final File file = File(pickedFile.path);
+
+      final image = await decodeImageFromList(file.readAsBytesSync());
+
+      if (image.width >= 800 || image.height >= 800) {
+        widget.controller.setImage(File(pickedFile.path));
+      }
+
+      if (widget.onError != null) widget.onError!();
+
+      return;
+    }
   }
 }
 

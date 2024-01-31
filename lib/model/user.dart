@@ -1,3 +1,5 @@
+import 'package:leve_sabor_admin_hub/model/user_image.dart';
+
 class User {
   final int? id;
   final String? name;
@@ -5,7 +7,7 @@ class User {
   final DateTime? birthday;
   final String? phone;
   final String? cpf;
-  final String? profilePicUrl;
+  final UserImage? image;
 
   const User({
     this.id,
@@ -14,7 +16,7 @@ class User {
     this.birthday,
     this.phone,
     this.cpf,
-    this.profilePicUrl,
+    this.image,
   });
 
   User.fromJson(Map<String, dynamic> json)
@@ -24,7 +26,7 @@ class User {
         birthday = json['birthday'] != null ? DateTime.parse(json['birthday']) : null,
         phone = json['phone'],
         cpf = json['cpf'],
-        profilePicUrl = json['profile_pic_url'];
+        image = json['user_image'] != null ? UserImage.fromJson(json['user_image']) : null;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -33,6 +35,8 @@ class User {
     'birthday': birthday?.toIso8601String(),
     'phone': phone,
     'cpf': cpf,
-    'profile_pic_url': profilePicUrl,
+    'image': image,
   };
+
+  String? get firstName => name?.split(' ')[0];
 }

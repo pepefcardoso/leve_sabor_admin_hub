@@ -8,14 +8,12 @@ class BlogPostCategoriesService {
   BlogPostCategoriesService({required this.http});
 
   Future<List<BlogPostCategory>> index() async {
-    final response = await http.getJson('/api/blog-post-category');
+    final response = await http.getJson('/api/blog-posts/categories');
 
     final List<dynamic>? data = response.data;
 
     if (data != null) {
-      return data
-          .map((dynamic json) => BlogPostCategory.fromJson(json))
-          .toList();
+      return data.map((dynamic json) => BlogPostCategory.fromJson(json)).toList();
     } else {
       throw const HttpException('Erro desconhecido');
     }
